@@ -39,9 +39,15 @@ test('a specific blog is within the returned blogs', async () => {
 });
 
 test('Id is Id not _id', async () => {
-    const response = await api.get('/api/blogs');
-    expect(response.toJSON()).toBeDefined('id')
-})
+  const response = await api.get('/api/blogs');
+  const blogs = response.body; 
+
+  blogs.forEach((blog) => {
+    expect(blog).toHaveProperty('id');
+    expect(blog).not.toHaveProperty('_id');
+  });
+});
+
 
 test('blogs are returned as json', async () => {
   await api
