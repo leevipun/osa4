@@ -22,43 +22,68 @@ blogsRouter.get('/:id', (request, response, next) => {
 blogsRouter.post('/', (request, response, next) => {
   const body = request.body
 
-  const blog = new Blog({
-  title: String,
-  author: String,
-  url: String,
-  likes: Number
-  })
+  const likes = body.likes !== undefined ? body.likes : 0;
 
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: likes
+  })
+if (body.title !== undefined && body.author !== undefined) {
   blog.save()
     .then(savedBlog => {
-      response.json(savedBlog)
+      response.status(201).json(savedBlog)
+      
     })
     .catch(error => next(error))
-})
-
-blogsRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then(() => {
-      response.status(204).end()
-    })
-    .catch(error => next(error))
-})
-
-blogsRouter.put('/:id', (request, response, next) => {
-  const body = request.body
-
-  const blog = {
-  title: String,
-  author: String,
-  url: String,
-  likes: Number
+  } else {
+    response.sendStatus(400).send('Add Title and Url');
   }
-
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then(updatedBlog => {
-      response.json(updatedBlog)
-    })
-    .catch(error => next(error))
 })
+
+blogsRouter.delete('/:id', async (request, response, next) => {
+  try {
+    const blogId = request.params.id;
+    const deletedBlog = await Blog.findByIdAndRemove(blogId);
+
+    if (deletedBlog) {
+      response.status(204).end(); // Return 204 No Content on successful deletion
+    } else {
+      response.status(404).end(); // Return 404 Not Found if blog was not found
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+blogsRouter.put('/:id', async (request, response, next) => {
+  const body = request.body;
+
+  const updatedBlog = {
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes,
+  };
+
+  try {
+    const blogId = request.params.id;
+    const updatedBlogDocument = await Blog.findByIdAndUpdate(
+      blogId,
+      updatedBlog,
+      { new: true }
+    );
+
+    if (updatedBlogDocument) {
+      response.json(updatedBlogDocument);
+    } else {
+      response.status(404).end(); 
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 module.exports = blogsRouter
