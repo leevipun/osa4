@@ -26,7 +26,7 @@ describe('favoriteBlog', () => {
         likes: 15
       })
     })
-    test('When list has two most liked blogs', () => {
+    test('When list has two or more most liked blogs', () => {
         const blogs = [
       {
         title: 'Blog 1',

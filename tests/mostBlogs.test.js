@@ -2,7 +2,7 @@ const favoriteBlog = require('../utils/favoriteBlog');
 const mostBlogs = require('../utils/mostBlogs')
 
 describe('favoriteBlog', () => {
-    test('When list has a one most liked blog', () => {
+    test('When list has a one author that has most blogs', () => {
         const blogs = [
       {
         title: 'Blog 1',
@@ -31,7 +31,7 @@ describe('favoriteBlog', () => {
         mostBlogs: 2
       })
     })
-    test('When list has two most liked blogs', () => {
+    test('When list has two or more authors that has most blogs', () => {
         const blogs = [
       {
         title: 'Blog 1',

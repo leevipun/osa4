@@ -1,7 +1,7 @@
 const mostlikesByAuthor = require('../utils/mostLikes')
 
-describe('favoritelikes', () => {
-    test('When list has a one most liked blog', () => {
+describe('Most Liked authoe', () => {
+    test('When list has a one most liked author', () => {
         const blogs = [
       {
         title: 'Blog 1',
