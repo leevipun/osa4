@@ -19,39 +19,27 @@ blogsRouter.get('/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-blogsRouter.post('/', (request, response, next) => {
-  const body = request.body
-
-  const likes = body.likes !== undefined ? body.likes : 0;
-
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: likes
-  })
-if (body.title !== undefined && body.author !== undefined) {
-  blog.save()
-    .then(savedBlog => {
-      response.status(201).json(savedBlog)
-      
-    })
-    .catch(error => next(error))
-  } else {
-    response.sendStatus(400).send('Add Title and Url');
-  }
-})
-
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.post('/', async (request, response, next) => {
   try {
-    const blogId = request.params.id;
-    const deletedBlog = await Blog.findByIdAndRemove(blogId);
-
-    if (deletedBlog) {
-      response.status(204).end(); // Return 204 No Content on successful deletion
-    } else {
-      response.status(404).end(); // Return 404 Not Found if blog was not found
+    const body = request.body;
+    
+    if (!body.title || !body.author) {
+      return response.status(400).json({ error: 'Title and author are required fields' });
     }
+    
+    const user = await User.findById(body.userId);
+    const likes = body.likes !== undefined ? body.likes : 0;
+
+    const blog = new Blog({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: likes,
+      user: user._id
+    });
+
+    const savedBlog = await blog.save();
+    response.status(201).json(savedBlog);
   } catch (error) {
     next(error);
   }
