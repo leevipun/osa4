@@ -7,12 +7,14 @@ const initialBlogs = [
     author: 'Leevi-Puntanen',
     url: 'https://example.com/blog1',
     likes: 3,
+    user: "65006167daac63258e964150"
   },
   {
     title: 'Heissulivei',
     author: 'Elsa-Norrby',
     url: 'https://example.com/blog2',
     likes: 2,
+    user: "65006167daac63258e964150"
   },
 ];
 
