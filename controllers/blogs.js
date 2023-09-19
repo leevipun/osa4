@@ -2,7 +2,9 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const jwt = require('jsonwebtoken');
 require('express-async-errors')
-const User = require('../models/user')
+const User = require('../models/user');
+const blog = require('../models/blog');
+const { extractUser } = require('../utils/middleware');
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -25,7 +27,7 @@ blogsRouter.post('/', async (request, response, next) => {
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
 
   const blog = new Blog({
     title: body.title,
@@ -46,15 +48,31 @@ if (body.title !== undefined && body.author !== undefined) {
   }
 })
 
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.delete('/:id', extractUser ,async (request, response, next) => {
   try {
+    const token = request.token
     const blogId = request.params.id;
-    const deletedBlog = await Blog.findByIdAndRemove(blogId);
 
-    if (deletedBlog) {
-      response.status(204).end(); // Return 204 No Content on successful deletion
+    if (!token) {
+      response.status(401).json({ error: "Token not found"})
+    }
+
+    const deletedBlog = await Blog.findById(blogId);
+
+    if (!deletedBlog) {
+      response.status(404).json({ error: "Blog not found"})
+    }
+
+    const user = request.user
+
+    if (user.toString() === user._id.toString()) {
+      await blog.findByIdAndRemove(blogId)
+
+      response.status(204).end()
     } else {
-      response.status(404).end(); // Return 404 Not Found if blog was not found
+      response.status(403).json({ error: "You dont have permission to delete this blod"})
+      console.log(user.toString())
+      console.log(user.id.toString())
     }
   } catch (error) {
     next(error);
