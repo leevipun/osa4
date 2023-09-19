@@ -1,4 +1,6 @@
+const { request } = require('http')
 const logger = require('./logger')
+const { response } = require('../app')
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -32,8 +34,20 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
+function extractToken(request, response, next) {
+  const authHeader = request.headers.authorization;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    request.token = token;
+  }
+
+  next(); 
+}
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
-  errorHandler
+  errorHandler,
+  extractToken
 }
