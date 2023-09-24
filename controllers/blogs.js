@@ -66,7 +66,7 @@ blogsRouter.delete("/:id", extractUser, async (request, response, next) => {
 
     const user = request.user;
 
-    if (user.toString() === user._id.toString()) {
+    if (user._id.toString() === user._id.toString()) {
       await blog.findByIdAndRemove(blogId);
 
       response.status(204).end();
@@ -74,7 +74,7 @@ blogsRouter.delete("/:id", extractUser, async (request, response, next) => {
       response
         .status(403)
         .json({ error: "You dont have permission to delete this blod" });
-      console.log(user.toString());
+      console.log(user._id.toString());
       console.log(user.id.toString());
     }
   } catch (error) {
